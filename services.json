@@ -1,0 +1,71 @@
+[
+  {
+    "name": "transmission",
+    "icon": "https://images.sftcdn.net/images/t_optimized,f_auto/p/c0753bf6-9b23-11e6-9b29-00163ec9f5fa/4195561453/transmission-logo.png",
+    "docker": {
+      "image": "linuxserver/transmission",
+      "port": 9091,
+      "flags": [
+        "-v {pwd}/data/transmission/watch:/watch",
+        "-v {pwd}/data/transmission/config:/config",
+        "-v {pwd}/data/transmission/downloads:/downloads",
+        "-e PGID=<gid>",
+        "-e PUID=<uid>",
+        "-e TZ=PST",
+        "-p 51413:51413",
+        "-p 51413:51413/udp"
+      ]
+    }
+  }, {
+    "name": "minecraft",
+    "icon": "http://piq.codeus.net/static/media/userpics/piq_19160_400x400.png",
+    "docker": {
+      "image": "itzg/minecraft-server",
+      "port": 25565,
+      "flags": []
+    }
+  }, {
+    "name": "amplifier",
+    "icon": "https://avatars3.githubusercontent.com/u/1082903?s=200&v=4",
+    "proxy_url": "http://192.168.1.168:80"
+  }, {
+    "name": "CnC",
+    "icon": "https://avatars3.githubusercontent.com/u/1082903?s=200&v=4",
+    "proxy_url": "http://192.168.1.18:8000"
+  }, {
+    "name": "sonarr",
+    "icon": "https://avatars3.githubusercontent.com/u/1082903?s=200&v=4",
+    "docker": {
+      "image": "linuxserver/sonarr",
+      "port": 8989,
+      "flags": [
+        "-e PUID=<UID>",
+        "-e PGID=<GID>",
+        "-e TZ=<timezone>",
+        "-v /etc/localtime:/etc/localtime:ro",
+        "-v </path/to/appdata>:/config",
+        "-v <path/to/tvseries>:/tv",
+        "-v <path/to/downloadclient-downloads>:/downloads"
+      ]
+    }
+  }, {
+    "name": "geemusic",
+    "icon": "https://store-images.s-microsoft.com/image/apps.17651.13510798887959718.974f49a4-bf2f-4494-a623-8357d7c3212f.1469baef-2d4f-4b5f-8e59-98ee0f9fedbb?w=180&h=180&q=60",
+    "docker": {
+      "image": "kuroshi/geemusic",
+      "flags": [],
+      "port": 4000
+    }
+  }, {
+    "name": "emby",
+    "icon": "https://emby.media/community/public/style_images/master/meta_image1.png",
+    "docker": {
+      "image": "emby/embyserver",
+      "port": 8096,
+      "flags": [
+        "-it --rm -v /usr/local/bin:/target"
+      ]
+    }
+  }
+]
+

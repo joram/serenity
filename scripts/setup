@@ -1,0 +1,9 @@
+#!/usr/bin/python
+import util
+
+for service in util.services():
+    # service.write_nginx_config()
+    service.get_image()
+    # service.create_container()
+    service.run()
+    break
