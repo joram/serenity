@@ -1,4 +1,5 @@
 import util
+import os
 
 
 class Service(object):
@@ -40,9 +41,20 @@ class Service(object):
                 util.run_bash("docker stop {name}".format(name=image_name))
             util.run_bash("docker rm {name}".format(name=image_name))
 
+    def ensure_data_dirs(self):
+        base_dir = "./data/{}".format(self._name)
+        data_dirs = [base_dir]
+        for folder in self.config["docker"].get("dirs", []):
+            data_dirs.append(os.path.join(base_dir, folder))
+
+        for data_dir in data_dirs:
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+
     def run(self):
         if 'docker' in self.config:
             self.stop()
+            self.ensure_data_dirs()
             cmd = "docker run -d --name {name} {flags} -p {port}:{port} {image_name}".format(
                 image_name=self.config['docker']['image'],
                 name="serenity_{name}".format(name=self._name),

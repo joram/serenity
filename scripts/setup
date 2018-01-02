@@ -1,9 +1,31 @@
 #!/usr/bin/python
 import util
+import json
+# for service in util.services():
+#     service.write_nginx_config()
+#     service.get_image()
+#     service.run()
+#
 
-for service in util.services():
-    # service.write_nginx_config()
-    service.get_image()
-    # service.create_container()
-    service.run()
-    break
+
+def build_index():
+    context = {}
+    with open("services.json", "r") as f:
+        services = json.loads(f.read())
+        for i in range(0, len(services)):
+            url = services[i].get("proxy_url")
+            if "docker" in services[i]:
+                url = "http://localhost:{}".format(services[i]["docker"]["port"])
+            services[i]['url'] = url
+        context["services"] = services
+
+    content = util.render("templates/index.html", context)
+    with open("./src/index.html", "w") as f:
+        f.write(content)
+
+    util.run_bash("docker stop serenity_index")
+    util.run_bash("docker rm serenity_index")
+    util.run_bash("docker build -t serenity_index .")
+    util.run_bash("docker run --name=serenity_index -p 8085:80 -d serenity_index")
+
+build_index()

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <meta charset="UTF-8">
+    <title>Serenity</title>
+</head>
+<body>
+
+<div class="imageGrid">
+  {% for service in services %}
+    <a href="{{ service.url }}">
+      <div class="tile" style="background-image: url('{{ service.icon }}');">
+        <div class="textWrapper"><h2>{{ service.name }}</h2>
+          <div class="content">{{ service.description }}</div>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+</body>
+</html>

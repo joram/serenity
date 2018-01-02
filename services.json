@@ -14,7 +14,8 @@
         "-e TZ=PST",
         "-p 51413:51413",
         "-p 51413:51413/udp"
-      ]
+      ],
+      "dirs": ["watch", "downloads", "config"]
     }
   }, {
     "name": "minecraft",
@@ -43,10 +44,11 @@
         "-e PGID=<GID>",
         "-e TZ=<timezone>",
         "-v /etc/localtime:/etc/localtime:ro",
-        "-v </path/to/appdata>:/config",
-        "-v <path/to/tvseries>:/tv",
-        "-v <path/to/downloadclient-downloads>:/downloads"
-      ]
+        "-v {pwd}/data/emby/config:/config",
+        "-v {pwd}/data/emby/tv:/tv",
+        "-v {pwd}/data/transmission/downloads:/downloads"
+      ],
+      "dirs": ["config", "tv", "downloads"]
     }
   }, {
     "name": "geemusic",
