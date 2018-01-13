@@ -9,8 +9,8 @@
         "-v {pwd}/data/transmission/watch:/watch",
         "-v {pwd}/data/transmission/config:/config",
         "-v {pwd}/data/transmission/downloads:/downloads",
-        "-e PGID=<gid>",
-        "-e PUID=<uid>",
+        "-e PGID={gid}",
+        "-e PUID={uid}",
         "-e TZ=PST",
         "-p 51413:51413",
         "-p 51413:51413/udp"
@@ -40,8 +40,8 @@
       "image": "linuxserver/sonarr",
       "port": 8989,
       "flags": [
-        "-e PUID=<UID>",
-        "-e PGID=<GID>",
+        "-e PUID={uid}",
+        "-e PGID={gid}",
         "-e TZ=<timezone>",
         "-v /etc/localtime:/etc/localtime:ro",
         "-v {pwd}/data/emby/config:/config",
@@ -73,21 +73,20 @@
     "docker": {
       "image": "linuxserver/unifi",
       "port": 8080,
+      "note": "10001 necessary as well",
       "dirs": ["config"],
       "flags": [
-        "-e PGID=<gid>",
-        "-e PUID=<uid>",
+        "-e PUID={uid}",
+        "-e PGID={gid}",
+        "-v {pwd}/data/unifi/config:/config",
         "-p 3478:3478/udp",
         "-p 10001:10001/udp",
-        "-p 8080:8080",
         "-p 8081:8081",
         "-p 8443:8443",
         "-p 8843:8843",
         "-p 8880:8880"
       ]
     }
-
-  linuxserver/unifi
-}
+  }
 ]
 

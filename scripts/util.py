@@ -13,10 +13,13 @@ def render(tpl_path, context):
     ).get_template(filename).render(context)
 
 
-def run_bash(cmd):
+def run_bash(cmd, log=False):
     pwd = os.path.abspath(".")
-    cmd = cmd.format(pwd=pwd)
-    print cmd
+    uid = os.getuid()
+    gid = os.getgid()
+    cmd = cmd.format(pwd=pwd, gid=gid, uid=uid)
+    if log:
+        print cmd
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     return output, error

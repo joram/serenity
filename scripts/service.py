@@ -61,4 +61,5 @@ class Service(object):
                 port=self.config['docker']['port'],
                 flags=" ".join(self.config['docker']['flags'])
             )
+            print "docker run -d --name {name} ...".format(name=self._name)
             util.run_bash(cmd)

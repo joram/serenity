@@ -24,7 +24,7 @@ def build_index():
     util.run_bash("docker run --name=serenity_index -p 8085:80 -d serenity_index")
 
 build_index()
-# for service in util.services():
-#     service.write_nginx_config()
-#     service.get_image()
-#     service.run()
+for service in util.services():
+    # service.write_nginx_config()
+    # service.get_image()
+    service.run()
