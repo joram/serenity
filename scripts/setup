@@ -1,30 +1,83 @@
 #!/usr/bin/python
 import util
 import json
-
+import argparse
+from service import HomeService
 
 def build_index():
     context = {}
     with open("services.json", "r") as f:
         services = json.loads(f.read())
         for i in range(0, len(services)):
-            url = services[i].get("proxy_url")
-            if "docker" in services[i]:
-                url = "http://localhost:{}".format(services[i]["docker"]["port"])
+            if "proxy_url" in services[i]:
+                url = services[i].get("proxy_url")
+                services[i]['url'] = url
+                continue
+            url = "http://{name}.serenity.oram.ca".format(name=services[i].get("name", "unknown"))
             services[i]['url'] = url
         context["services"] = services
 
     content = util.render("templates/index.html", context)
-    with open("./src/index.html", "w") as f:
+    with open("./home/src/index.html", "w") as f:
         f.write(content)
 
     util.run_bash("docker stop serenity_index")
-    util.run_bash("docker rm serenity_index")
-    util.run_bash("docker build -t serenity_index .")
+    util.run_bash("docker rm -f serenity_index")
+    util.run_bash("docker build -t serenity_index ./home/")
     util.run_bash("docker run --name=serenity_index -p 8085:80 -d serenity_index")
 
-build_index()
-for service in util.services():
-    # service.write_nginx_config()
-    # service.get_image()
+    HomeService().write_nginx_config()
+
+
+def process_service(args, service):
+    if args.nginx:
+        print "  building nginx config..."
+        service.write_nginx_config()
+    if args.docker:
+        print "  pulling latest docker container..."
+        service.get_image()
+    if args.data:
+        print "  nuking data dir... (TODO)"
+
+    print "  running..."
     service.run()
+
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    raise argparse.ArgumentTypeError('Boolean value expected.')
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process a services.json file.')
+    parser.add_argument('--service', default=None, help='a specific service to rebuild.')
+    parser.add_argument('--all', default=False, type=str2bool, help='rebuild all services.')
+    parser.add_argument('--index', default=False, type=str2bool, help='rebuild index service.')
+    parser.add_argument('--nginx', default=True, type=str2bool, help='rebuild nginx configs.')
+    parser.add_argument('--docker', default=False, type=str2bool, help='pull latest docker image.')
+    parser.add_argument('--data', default=False, type=str2bool, help='nuke the data dir for the service.')
+    args = parser.parse_args()
+    
+    if args.index:
+        print "building index service..."
+        build_index()
+    
+    if args.service != None:
+        print "procssing service {}...".format(args.service) 
+        for service in util.services():
+            if service._name == args.service:
+                process_service(args, service)
+    elif args.all:
+        print "processing all services..."
+        for service in util.services():
+            print "procssing service {}...".format(service._name) 
+            process_service(args, service)
+    else:
+        print "please provide some args"
+
+    if args.nginx:
+        print "restarting nginx..."
+        util.run_bash("service nginx restart")
+

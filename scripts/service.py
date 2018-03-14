@@ -7,25 +7,40 @@ class Service(object):
     def __init__(self, config):
         self.config = config
 
+
     @property
-    def _proxy_url(self):
+    def _ports(self):
+        ports = []
+        port = self.config['docker'].get('port')
+        if port is not None:
+            ports = [port]
+        ports += self.config['docker'].get('ports', [])
+        return ports
+
+    def proxy_url(self, port):
         if 'docker' in self.config:
-            port = self.config['docker']['port']
-            return "http://localhost:{port}".format(port=port)
+            protocol = self.config["docker"].get("protocol", "http")
+            return "{protocol}://localhost:{port}".format(port=port, protocol=protocol)
         return self.config['proxy_url']
 
     @property
     def _name(self):
         return self.config['name']
 
+    @property
+    def _nginx_context(self):
+        port = self.config['docker'].get('port')
+        return {
+            "name": self._name,
+            "url": self.proxy_url(port),
+        }
+
     def write_nginx_config(self):
+        if "proxy_url" in self.config:
+            return
         filepath = "/etc/nginx/sites-enabled/{name}".format(name=self._name)
         with open(filepath, "w") as f:
-            context = {
-                "name": self._name,
-                "proxy_url": self._proxy_url
-            }
-            content = util.render("./templates/nginx_config", context)
+            content = util.render("./templates/nginx_config", self._nginx_context)
             f.write(content)
 
     def get_image(self):
@@ -55,11 +70,25 @@ class Service(object):
         if 'docker' in self.config:
             self.stop()
             self.ensure_data_dirs()
-            cmd = "docker run -d --name {name} {flags} -p {port}:{port} {image_name}".format(
+            flags = self.config['docker']['flags']
+            flags += ["-p {port}:{port}".format(port=p) for p in self._ports]
+            cmd = "docker run -d --name {name} {flags} {image_name}".format(
                 image_name=self.config['docker']['image'],
                 name="serenity_{name}".format(name=self._name),
-                port=self.config['docker']['port'],
-                flags=" ".join(self.config['docker']['flags'])
+                flags=" ".join(flags)
             )
-            print "docker run -d --name {name} ...".format(name=self._name)
             util.run_bash(cmd)
+
+class HomeService(Service):
+
+    def __init__(self):
+        self.config = {}
+
+    @property
+    def _name(self):
+        return "home"
+
+    @property
+    def _nginx_context(self):
+        return {"url": "http://127.0.0.1:8085", "name": ""}
+

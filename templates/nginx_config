@@ -1,6 +1,5 @@
 server {
-
-  server_name {{ name }}.serenity.oram.ca;
+  server_name {{ name }}{% if name!="" %}.{% endif %}serenity.oram.ca;
 
   location / {
     client_max_body_size    15M;
@@ -11,11 +10,10 @@ server {
     proxy_set_header X-Scheme $scheme;
     proxy_connect_timeout 10;
     proxy_read_timeout 10;
-    proxy_pass {{ proxy_url }};
+    proxy_pass {{ url }};
 
     auth_basic "Restricted {{ name }}";
     auth_basic_user_file /etc/nginx/.htpasswd;
-
   }
-
 }
+

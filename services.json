@@ -1,5 +1,21 @@
 [
   {
+    "name": "jackett",
+    "icon": "https://avatars3.githubusercontent.com/u/15383019?s=400&v=4",
+    "docker": {
+      "image": "linuxserver/jackett",
+      "port": 9117,
+      "flags": [
+	"-v {pwd}/data/jackett/config:/config",
+	"-v {pwd}/data/jackett/downloads:/downloads",
+        "-v /etc/localtime:/etc/localtime:ro",
+        "-e TZ=PST",
+        "-e PUID={uid}",
+        "-e PGID={gid}"
+      ],
+      "dirs": ["downloads", "config"]
+    }
+  }, {
     "name": "transmission",
     "icon": "https://images.sftcdn.net/images/t_optimized,f_auto/p/c0753bf6-9b23-11e6-9b29-00163ec9f5fa/4195561453/transmission-logo.png",
     "docker": {
@@ -19,7 +35,7 @@
     }
   }, {
     "name": "minecraft",
-    "icon": "http://piq.codeus.net/static/media/userpics/piq_19160_400x400.png",
+    "icon": "https://rocketdock.com/images/screenshots/Minecraft-Icon.png",
     "docker": {
       "image": "itzg/minecraft-server",
       "port": 25565,
@@ -27,11 +43,11 @@
     }
   }, {
     "name": "amplifier",
-    "icon": "https://avatars3.githubusercontent.com/u/1082903?s=200&v=4",
+    "icon": "https://cdn4.iconfinder.com/data/icons/unigrid-devices/61/017_receiver_amplifier_dvd_bluray_cd_media_player_2-512.png",
     "proxy_url": "http://192.168.1.168:80"
   }, {
     "name": "CnC",
-    "icon": "https://avatars3.githubusercontent.com/u/1082903?s=200&v=4",
+    "icon": "https://png.icons8.com/metro/1600/cnc-machine.png",
     "proxy_url": "http://192.168.1.18:8000"
   }, {
     "name": "sonarr",
@@ -42,11 +58,11 @@
       "flags": [
         "-e PUID={uid}",
         "-e PGID={gid}",
-        "-e TZ=<timezone>",
+        "-e TZ=PST",
         "-v /etc/localtime:/etc/localtime:ro",
-        "-v {pwd}/data/emby/config:/config",
-        "-v {pwd}/data/emby/tv:/tv",
-        "-v {pwd}/data/transmission/downloads:/downloads"
+        "-v {pwd}/data/sonarr/config:/config",
+        "-v {pwd}/data/sonarr/tv:/tv",
+        "-v {pwd}/data/transmission/downloads/complete:/downloads"
       ],
       "dirs": ["config", "tv", "downloads"]
     }
@@ -57,6 +73,9 @@
       "image": "kuroshi/geemusic",
       "flags": [],
       "port": 4000
+    },
+    "nginx": {
+      "secure": true
     }
   }, {
     "name": "emby",
@@ -65,26 +84,34 @@
       "image": "emby/embyserver",
       "port": 8096,
       "flags": [
-        "-it --rm -v /usr/local/bin:/target"
-      ]
+        "-e PUID={uid}",
+        "-e PGID={gid}",
+        "-v {pwd}/data/emby/config:/config",
+        "-v {pwd}/data/emby/tv:/mnt/share1",
+	"--publish 8920:8920"
+      ],
+      "dirs": ["config", "tv"]
     }
   }, {
     "name": "unifi",
+    "icon": "https://lh3.googleusercontent.com/ZGHIVrzbVeA2mEM13mgVZ36lxw6c-R-sFPUqt2_dA7FO9-vT1SNdRFJw_7HXhXznxWE=w300",
+    "proxy_url": "http://192.168.1.8:8080",
     "docker": {
       "image": "linuxserver/unifi",
-      "port": 8080,
-      "note": "10001 necessary as well",
+      "protocol": "http",
       "dirs": ["config"],
       "flags": [
         "-e PUID={uid}",
         "-e PGID={gid}",
         "-v {pwd}/data/unifi/config:/config",
-        "-p 3478:3478/udp",
-        "-p 10001:10001/udp",
+        "-p 8080:8080",
         "-p 8081:8081",
         "-p 8443:8443",
         "-p 8843:8843",
-        "-p 8880:8880"
+        "-p 8880:8880",
+        "-p 3478:3478",
+        "-p 10001:1000",
+	"--network host"
       ]
     }
   }

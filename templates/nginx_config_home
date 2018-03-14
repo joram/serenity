@@ -1,0 +1,9 @@
+server {
+
+  server_name serenity.oram.ca;
+  listen 80 default_server;
+
+  location / {
+    proxy_pass localhost:8085;
+  }
+}
