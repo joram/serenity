@@ -95,7 +95,7 @@
   }, {
     "name": "unifi",
     "icon": "https://lh3.googleusercontent.com/ZGHIVrzbVeA2mEM13mgVZ36lxw6c-R-sFPUqt2_dA7FO9-vT1SNdRFJw_7HXhXznxWE=w300",
-    "proxy_url": "http://192.168.1.8:8080",
+    "proxy_url": "http://192.168.1.9:8080",
     "docker": {
       "image": "linuxserver/unifi",
       "protocol": "http",
