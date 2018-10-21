@@ -20,9 +20,25 @@ serenity-sonarr:
 
 serenity-transmission:
   image: dperson/transmission
+  container_name: serenity-jackett
+  restart: always
   ports:
     - 9091:9091
   volumes:
     # In order to the container uses the same date which is in the host, it is necessary to share /etc/localtime file
     - /etc/localtime:/etc/localtime:ro
     - ./tvshows:/var/lib/transmission-daemon/downloads:rw
+    
+serenity-jackett:
+    image: linuxserver/jackett
+    container_name: serenity-jackett
+    restart: always
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/London
+    volumes:
+      - ${MOUNT_POINT}/jackett/config:/config
+      - ${MOUNT_POINT}/jackett/downloads:/downloads
+    ports:
+      - "9117:9117"
