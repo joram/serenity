@@ -1,8 +1,8 @@
 .idea*
+s-home/.htpasswd
+s-home/.nginx_serenity
+s-*/.env
+s-*/data
 
-data
-data*
-./data*
 *.pyc
 *.tar.gz
-serenity*/.env

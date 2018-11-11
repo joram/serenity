@@ -1,5 +1,15 @@
 
 
+serenity-home:
+  image: serenity-home
+  container_name: serenity-home
+  ports:
+    - 80:80
+  environment:
+    - SERENITY_NAME=Home
+    - SERENITY_PORT=80
+    - SERENITY_ICON_URL=http://www.stickpng.com/assets/thumbs/588a668cd06f6719692a2d1b.png
+
 serenity-sonarr:
   image: linuxserver/sonarr
   container_name: serenity-sonarr
@@ -19,7 +29,7 @@ serenity-sonarr:
     - ./tvshows:/tv:rw
 
 serenity-transmission:
-  image: dperson/transmission
+  image: linuxserver/transmission
   container_name: serenity-transmission
   restart: always
   environment:
@@ -27,13 +37,14 @@ serenity-transmission:
     - SERENITY_PORT=9091
     - SERENITY_ICON_URL=https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Transmission_Icon.svg/480px-Transmission_Icon.svg.png
   env_file:
-    - ./serenity=transmissioni/.env # for TRUSEr and TRPASSWD
+    - ./s-transmission/.env  # for TRUSEr and TRPASSWD
   ports:
     - 9091:9091
   volumes:
     # In order to the container uses the same date which is in the host, it is necessary to share /etc/localtime file
     - /etc/localtime:/etc/localtime:ro
-    - ./tvshows:/var/lib/transmission-daemon/downloads:rw
+    - ./s-transmission/data/downloads:/downloads:rw
+    - ./s-transmission/data/config:/config:rw
     
 serenity-jackett:
     image: linuxserver/jackett
