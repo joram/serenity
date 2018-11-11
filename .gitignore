@@ -5,3 +5,4 @@ data*
 ./data*
 *.pyc
 *.tar.gz
+serenity*/.env

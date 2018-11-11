@@ -3,6 +3,13 @@ import util
 import json
 import argparse
 from service import HomeService
+import yaml
+
+def enumerate_services():
+    with open("compose.yaml") as f:
+        content = f.read()
+        data = yaml.dump(yaml.load(content))
+        print data()
 
 def build_index():
     context = {}
@@ -51,6 +58,9 @@ def str2bool(v):
     raise argparse.ArgumentTypeError('Boolean value expected.')
 
 if __name__ == "__main__":
+    enumerate_services()
+
+if __name__ != "__main__":
     parser = argparse.ArgumentParser(description='Process a services.json file.')
     parser.add_argument('--service', default=None, help='a specific service to rebuild.')
     parser.add_argument('--all', default=False, type=str2bool, help='rebuild all services.')
