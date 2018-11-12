@@ -1,24 +1,24 @@
 server {
   #server_name serenity.oram.ca;
   server_name 192.168.1.7;
+  root /var/www;
+  index index.html index.htm;
+  
+  location / {
+    try_files $uri $uri/ @root;
+  }
+
+  # If nginx can't find a file, fallback to the homepage.
+  location @root {
+    rewrite .* / redirect;
+  }
 
   {% for s in services %}
-  {% if name != "home" %}
-  location /{{ s.name|lower }} {
-    client_max_body_size    15M;
-    proxy_pass_header Server;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Scheme $scheme;
-    proxy_connect_timeout 10;
-    proxy_read_timeout 10;
-    proxy_pass {{ s.url }};
-
-    auth_basic "Restricted {{ s.name }}";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-  }
-  {% endif %}
+    {% if s.name|lower != "home" %}
+      {{ s.nginx_location }}
+    {% endif %}
   {% endfor %}
+
+  include /etc/nginx/basic.conf;
 }
 

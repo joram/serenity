@@ -22,7 +22,14 @@ class Service(object):
     
     @property
     def url(self):
-        return "http://192.168.1.7:{port}".format(port=self.port)
+        return "/{name}".format(name=self.name.lower())
+
+    @property
+    def nginx_location(self):
+        path = "../s-{name}/nginx_config".format(name=self.name.lower())
+        with open(path) as f:
+            content = f.read()
+        return content
 
 
 def get_services():

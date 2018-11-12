@@ -3,6 +3,10 @@
 serenity-home:
   image: serenity-home
   container_name: serenity-home
+  links:
+    - serenity-transmission:transmission
+    - serenity-sonarr:sonarr
+    - serenity-jackett:jackett
   ports:
     - 80:80
   environment:
@@ -16,8 +20,8 @@ serenity-sonarr:
   ports:
     - 8989:8989
   environment:
-    - PUID=root 
-    - PGID=root
+    - PUID=1000 
+    - PGID=1000
     - SERENITY_NAME=Sonarr
     - SERENITY_PORT=8989
     - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
@@ -25,14 +29,17 @@ serenity-sonarr:
     # In order to the container uses the same date which is in the host, it is necessary to share /etc/localtime file
     - /etc/localtime:/etc/localtime:ro
     - /dev/rtc:/dev/rtc:ro
-    - ./config:/config:rw
-    - ./tvshows:/tv:rw
+    - ./s-sonarr/data/config/:/config
+    - /home/john/raid/Video/TV/:/tv
+    - ./s-transmission/data/downloads/complete:/downloads
 
 serenity-transmission:
   image: linuxserver/transmission
   container_name: serenity-transmission
   restart: always
   environment:
+    - PUID=1000 
+    - PGID=1000
     - SERENITY_NAME=Transmission
     - SERENITY_PORT=9091
     - SERENITY_ICON_URL=https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Transmission_Icon.svg/480px-Transmission_Icon.svg.png
@@ -58,7 +65,7 @@ serenity-jackett:
       - SERENITY_PORT=9117
       - SERENITY_ICON_URL=https://user-images.githubusercontent.com/27040483/28728094-99f3e3f6-73c7-11e7-8f8d-28912dc6ac0d.png
     volumes:
-      - ${MOUNT_POINT}/jackett/config:/config
-      - ${MOUNT_POINT}/jackett/downloads:/downloads
+      - ./s-jackett/data/config:/config
+      - ./s-jackett/data/downloads:/downloads
     ports:
-      - "9117:9117"
+      - 9117:9117
