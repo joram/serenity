@@ -4,6 +4,70 @@
 ## DIR_MOVIES
 
 
+
+
+
+
+docker pull nvllsvm/emby-unlocked
+ nzbget:
+        image: linuxserver/nzbget
+        container_name: nzbget
+        volumes:
+            - /path/to/nzbget/config:/config
+            - /path/to/nzbget/downloads:/downloads
+        restart: always
+        environment:
+            - TZ=America/New_York
+        ports:
+            - 6789:6789
+            
+                radarr:
+        image: linuxserver/radarr
+        container_name: radarr
+        depends_on:
+            - nzbget
+        volumes:
+            - /path/to/radarr/config:/config
+            - /path/to/nzbget/downloads:/downloads
+            - /path/to/plex/Movies:/movies
+        environment:
+            - TZ=America/New_York
+        ports:
+            - 7878:7878
+            
+            
+            
+# nginx-proxy:
+#   container_name: nginx-proxy
+#   image: alexanderkrause/rpi-nginx-proxy
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #     - /home/pi/nginx/certs:/etc/nginx/certs
+  #     - /etc/nginx/vhost.d
+  #     - /usr/share/nginx/html
+  #   labels:
+  #     - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+
+  # letsencrypt:
+  #   container_name: letsencrypt
+  #   image: alexanderkrause/rpi-letsencrypt-nginx-proxy-companion
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - /home/pi/nginx/certs:/etc/nginx/certs
+  #   volumes_from:
+  #     - nginx-proxy
+  #   depends_on: 
+  #     - nginx-proxy
+            
+            
+            
+            
+            
+            
+            
 serenity-home:
   image: serenity-home
   container_name: serenity-home
