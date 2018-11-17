@@ -6,6 +6,9 @@ version: '3'
 ## BASE_URL
 
 services:
+
+
+        
   s-nginx-proxy:
     container_name: s-nginx-proxy
     image: jwilder/nginx-proxy:latest
@@ -15,7 +18,6 @@ services:
     depends_on:
       - s-home
       - s-sonarr
-      - s-jackett
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
   
@@ -31,7 +33,7 @@ services:
 
   s-home:
     image: serenity-home
-    container_name: serenity-home
+    container_name: s-home
     ports:
       - 8001:80
     environment:
@@ -46,7 +48,7 @@ services:
     environment:
       - PUID=1000 
       - PGID=1000
-      - VIRTUAL_HOST=sonarr.${BASE_URL},localhost/sonarr
+      - VIRTUAL_HOST=sonarr.${BASE_URL}
       - SERENITY_NAME=Sonarr
       - SERENITY_PORT=8989
       - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
@@ -57,22 +59,57 @@ services:
       - ${DIR_TV}:/tv
       - ${DIR_DOWNLOADS}/complete:/downloads
 
-    
-  s-jackett:
-    image: linuxserver/jackett:latest
-    container_name: s-jackett
+
+  s-radarr:
+    image: linuxserver/radarr:latest
+    container_name: s-radarr
     ports:
-      - 9117:9117
+      - 7878:7878
     environment:
+      - PUID=1000 
       - PGID=1000
-      - PUID=1000
-      - TZ=Pacific/Vancouver
-      - VIRTUAL_HOST=jackett.${BASE_URL},localhost/jackett
-      - SERENITY_NAME=Jackett
-      - SERENITY_PORT=9117
-      - SERENITY_ICON_URL=https://user-images.githubusercontent.com/27040483/28728094-99f3e3f6-73c7-11e7-8f8d-28912dc6ac0d.png
+      - VIRTUAL_HOST=radarr.${BASE_URL}
+      - SERENITY_NAME=Radarr
+      - SERENITY_PORT=7878
+      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
     volumes:
-      - ./s-jackett/data/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /dev/rtc:/dev/rtc:ro
+      - ./s-radarr/data/config/:/config
+      - ${DIR_MOVIES}:/movies
+      - ${DIR_DOWNLOADS}/complete:/downloads
+
+
+  s-emby:
+    image: nvllsvm/emby-unlocked
+    container_name: s-emby
+    ports:
+      - 8096:8096
+    environment:
+      - PUID=1000 
+      - PGID=1000
+      - VIRTUAL_HOST=emby.${BASE_URL}
+      - SERENITY_NAME=Emby
+      - SERENITY_PORT=8096
+      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+    volumes:
+      - ./s-emby/data/config/:/config
+      - ${DIR_TV}:/media/tv
+      - ${DIR_MOVIES}:/media/movies
+
+
+  s-nzbget:
+    image: linuxserver/nzbget
+    container_name: s-nzbget
+    ports:
+      - 6789:6789
+    environment:
+      - PUID=1000 
+      - PGID=1000
+      - VIRTUAL_HOST=nzbget.${BASE_URL}
+      - SERENITY_NAME=Nzbget
+      - SERENITY_PORT=6789
+      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+    volumes:
+      - ./s-nzbget/data/config/:/config
       - ${DIR_DOWNLOADS}:/downloads
-
-

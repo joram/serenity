@@ -14,16 +14,31 @@ def render(tpl_path, context):
 
 class Service(object):
 
-    def __init__(self, name, icon_url, port):
-        self.name = name
-        self.icon_url = icon_url
-        self.port = port
+    def __init__(self, data, service_name):
+        print service_name
+        self._data = data
+        self._env = {}
+        for env in data.get("environment", []):
+            k,v = env.split("=")
+            self._env[k] = v
         if self.active:
-            download_file(icon_url, "./src/icons/{}.png".format(name).lower())
+            download_file(self.icon_url, "./src/icons/{}.png".format(self.name).lower())
+
+    @property
+    def name(self):
+        return self._env.get("SERENITY_NAME")
+    
+    @property
+    def icon_url(self):
+        return self._env.get("SERENITY_ICON_URL")
+    
+    @property
+    def port(self):
+        return self._env.get("SERENITY_PORT", None)
    
     @property
     def active(self):
-        return self.port != ""
+        return self.port is not None
 
     @property
     def url(self):
@@ -40,23 +55,10 @@ class Service(object):
 def get_services():
     with open("../docker-compose.yml") as f:
         content = f.read()
-        services = yaml.load(content)
-
-    for details in services.values():
-        name = ""
-        icon_url = ""
-        port = ""
-        env = details.get("environment", [])
-        for e in env:
-            if "=" in e:
-                k,v = e.split("=")
-                if k == "SERENITY_NAME":
-                    name = v
-                if k == "SERENITY_ICON_URL":
-                    icon_url = v
-                if k == "SERENITY_PORT":
-                    port = v
-        yield Service(name, icon_url, port)
+        compose = yaml.load(content)
+        for n in compose.get("services"):
+            data = compose.get("services").get(n)
+            yield Service(data, n)
 
 
 def download_file(url, path):

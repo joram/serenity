@@ -2,5 +2,4 @@
 
 source ./scripts/.env
 
-docker-compose up -d --remove-orphans -t 60
-#docker image prune -a
+docker-compose up -d -t 60 --build
