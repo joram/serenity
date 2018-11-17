@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source ./scripts/.env
+
+cd s-home
+python ./build_home.py
+docker build . -t serenity-home
+cd ..

@@ -18,8 +18,13 @@ class Service(object):
         self.name = name
         self.icon_url = icon_url
         self.port = port
-        download_file(icon_url, "./src/icons/{}.png".format(name).lower())
-    
+        if self.active:
+            download_file(icon_url, "./src/icons/{}.png".format(name).lower())
+   
+    @property
+    def active(self):
+        return self.port != ""
+
     @property
     def url(self):
         return "/{name}".format(name=self.name.lower())
@@ -57,7 +62,7 @@ def get_services():
 def download_file(url, path):
     if os.path.exists(path):
         return
-    print "downloading {} to {}".format(url, path)
+    print("downloading {} to {}".format(url, path))
     r = requests.get(url, allow_redirects=True)
     open(path, 'wb').write(r.content)
 
@@ -68,14 +73,7 @@ def build_index(services):
     with open("./src/index.html", "w") as f:
         f.write(content)
 
-def build_nginx(services):
-    context = {"services": services}
-    content = render("./templates/nginx_config", context)
-    with open("./.nginx_serenity", "w") as f:
-        f.write(content)
-
 if __name__ == "__main__":
     services = list(get_services())
     build_index(services)
-    build_nginx(services)
         

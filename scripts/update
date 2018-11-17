@@ -1,6 +1,6 @@
-cd s-home
-python ./build_home.py
-docker build . -t serenity-home
-cd ..
+#!/bin/bash
 
-docker-compose up -d --build
+source ./scripts/.env
+
+docker-compose up -d --remove-orphans -t 60
+#docker image prune -a
