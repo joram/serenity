@@ -36,8 +36,11 @@ services:
     container_name: s-home
     ports:
       - 8001:80
+      - 444:443
     environment:
-      - VIRTUAL_HOST=home.${BASE_URL},localhost/home
+      - VIRTUAL_HOST=home.${BASE_URL}
+      - DESCRIPTION=""
+      - ICON_URL=http://www.stickpng.com/assets/images/588a6758d06f6719692a2d22.png
 
 
   s-sonarr:
@@ -49,9 +52,9 @@ services:
       - PUID=1000 
       - PGID=1000
       - VIRTUAL_HOST=sonarr.${BASE_URL}
-      - SERENITY_NAME=Sonarr
-      - SERENITY_PORT=8989
-      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+      - NETWORK_ACCESS=internal
+      - DESCRIPTION=TV
+      - ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /dev/rtc:/dev/rtc:ro
@@ -69,9 +72,9 @@ services:
       - PUID=1000 
       - PGID=1000
       - VIRTUAL_HOST=radarr.${BASE_URL}
-      - SERENITY_NAME=Radarr
-      - SERENITY_PORT=7878
-      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+      - NETWORK_ACCESS=internal
+      - DESCRIPTION=Movies
+      - ICON_URL=https://i.imgur.com/WfcxC8g.png
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /dev/rtc:/dev/rtc:ro
@@ -89,9 +92,9 @@ services:
       - PUID=1000 
       - PGID=1000
       - VIRTUAL_HOST=emby.${BASE_URL}
-      - SERENITY_NAME=Emby
-      - SERENITY_PORT=8096
-      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+      - NETWORK_ACCESS=internal
+      - DESCRIPTION="Media Player"
+      - ICON_URL=https://images-na.ssl-images-amazon.com/images/I/51WJTxymC6L.png
     volumes:
       - ./s-emby/data/config/:/config
       - ${DIR_TV}:/media/tv
@@ -107,9 +110,9 @@ services:
       - PUID=1000 
       - PGID=1000
       - VIRTUAL_HOST=nzbget.${BASE_URL}
-      - SERENITY_NAME=Nzbget
-      - SERENITY_PORT=6789
-      - SERENITY_ICON_URL=https://cloud.githubusercontent.com/assets/22151176/18439012/f061c0e2-7903-11e6-826a-bd36d6288fcb.png
+      - NETWORK_ACCESS=internal
+      - DDESCRIPTION=Downloader
+      - ICON_URL=https://avatars2.githubusercontent.com/u/3368377?s=280&v=4
     volumes:
       - ./s-nzbget/data/config/:/config
       - ${DIR_DOWNLOADS}:/downloads

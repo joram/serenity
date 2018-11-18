@@ -16,33 +16,37 @@ class Service(object):
 
     def __init__(self, data, service_name):
         print service_name
+        self._service_name = service_name
         self._data = data
         self._env = {}
         for env in data.get("environment", []):
-            k,v = env.split("=")
+            k,v = env.split("=", 1)
             self._env[k] = v
-        if self.active:
+        if self.icon_url:
             download_file(self.icon_url, "./src/icons/{}.png".format(self.name).lower())
 
     @property
     def name(self):
-        return self._env.get("SERENITY_NAME")
+        n = self._env.get("VIRTUAL_HOST", ".").split(".")[0]
+        if n is "" or n is None:
+            return self._service_name.replace("s-", "")
+        return n
+    
+    @property
+    def description(self):
+        return self._env.get("DESCRIPTION", "")
     
     @property
     def icon_url(self):
-        return self._env.get("SERENITY_ICON_URL")
+        return self._env.get("ICON_URL")
     
     @property
-    def port(self):
-        return self._env.get("SERENITY_PORT", None)
-   
-    @property
     def active(self):
-        return self.port is not None
+        return self.url is not None
 
     @property
     def url(self):
-        return "/{name}".format(name=self.name.lower())
+        return self._env.get("VIRTUAL_HOST")
 
     @property
     def nginx_location(self):

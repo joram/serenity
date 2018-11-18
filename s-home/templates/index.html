@@ -9,13 +9,15 @@
 
 <div class="imageGrid">
   {% for service in services %}
-    <a href="{{ service.url }}">
+  {% if service.active %}
+  <a href="{{ service.url }}">
       <div class="tile" style="background-image: url('{{ service.icon_url }}');">
         <div class="textWrapper"><h2>{{ service.name }}</h2>
           <div class="content">{{ service.description }}</div>
         </div>
       </div>
     </a>
+  {% endif %}
   {% endfor %}
 </div>
 
