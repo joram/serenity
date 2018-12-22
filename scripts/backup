@@ -1,0 +1,7 @@
+tar -zcf backup-s-unifi.tar.gz s-unifi
+tar -zcf backup-s-sonarr.tar.gz s-sonarr
+tar -zcf backup-s-radarr.tar.gz s-radarr
+tar -zcf backup-s-plex.tar.gz s-plex
+tar -zcf backup-s-nzbget.tar.gz s-nzbget
+tar -zcf backup-s-jackett.tar.gz s-jackett
+tar -zcf backup-s-home.tar.gz s-home

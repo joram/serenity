@@ -4,11 +4,8 @@ version: '3'
 ## DIR_TV
 ## DIR_MOVIES
 ## BASE_URL
-
 services:
 
-
-        
   s-nginx-proxy:
     container_name: s-nginx-proxy
     image: jwilder/nginx-proxy:latest
@@ -21,6 +18,29 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
   
+  s-unifi:
+    container_name: s-unifi
+    image: linuxserver/unifi:latest
+    environment:
+      - PUID=1000 
+      - PGID=1000
+      - VIRTUAL_HOST=unifi.${BASE_URL}
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_PORT=8443
+      - DESCRIPTION=Network
+      - ICON_URL=https://miro-icmfxmvdkqz7ku.stackpathdns.com/wp-content/uploads/UniFi-App.png
+    ports:
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 8081:8081
+      - 8443:8443
+      - 8843:8843
+      - 8880:8880
+      - 6789:6789
+    volumes:
+      - ./s-unifi/data/config:/config
+
       #s-letsencrypt:
       #container_name: s-letsencrypt
       #image: jrcs/letsencrypt-nginx-proxy-companion
@@ -30,7 +50,6 @@ services:
       # volumes_from:
 #    - s-nginx-proxy
 
-
   s-home:
     image: serenity-home
     container_name: s-home
@@ -39,9 +58,7 @@ services:
       - 444:443
     environment:
       - VIRTUAL_HOST=home.${BASE_URL}
-      - DESCRIPTION=""
-      - ICON_URL=http://www.stickpng.com/assets/images/588a6758d06f6719692a2d22.png
-
+      - NETWORK_ACCESS=internal
 
   s-sonarr:
     image: linuxserver/sonarr:latest
@@ -60,8 +77,7 @@ services:
       - /dev/rtc:/dev/rtc:ro
       - ./s-sonarr/data/config/:/config
       - ${DIR_TV}:/tv
-      - ${DIR_DOWNLOADS}/complete:/downloads
-
+      - ${DIR_DOWNLOADS}:/downloads
 
   s-radarr:
     image: linuxserver/radarr:latest
@@ -80,38 +96,46 @@ services:
       - /dev/rtc:/dev/rtc:ro
       - ./s-radarr/data/config/:/config
       - ${DIR_MOVIES}:/movies
-      - ${DIR_DOWNLOADS}/complete:/downloads
+      - ${DIR_DOWNLOADS}:/downloads
 
-
-  s-emby:
-    image: nvllsvm/emby-unlocked
-    container_name: s-emby
-    ports:
-      - 8096:8096
-    environment:
+  s-plex:
+    container_name: s-plex
+    image: timhaak/plex:latest
+    network_mode: host
+    environment: 
+      - VERSION=latest
       - PUID=1000 
       - PGID=1000
-      - VIRTUAL_HOST=emby.${BASE_URL}
-      - NETWORK_ACCESS=internal
-      - DESCRIPTION="Media Player"
-      - ICON_URL=https://images-na.ssl-images-amazon.com/images/I/51WJTxymC6L.png
+    ports:
+      - 32400:32400 #(for access to the Plex Media Server) [required]
+      - 32400:32400/udp
+      - 32410:32410/udp #(for current GDM network discovery)
+      - 32412:32412/udp 
+      - 32413:32413/udp 
+      - 32414:32414/udp
+      - 32469:32469 #(for access to the Plex DLNA Server)
+      - 32469:32469/udp
+      - 5353:5353 # (for older Bonjour/Avahi network discovery)
+      - 1900:1900/udp #(for access to the Plex DLNA Server)
     volumes:
-      - ./s-emby/data/config/:/config
-      - ${DIR_TV}:/media/tv
-      - ${DIR_MOVIES}:/media/movies
-
+      - ./s-plex/config/:/config
+      - ./s-plex/transcode/:/transcode
+      - ${DIR_MOVIES}:/data/movies
+      - ${DIR_TV}:/data/tvshows
+    expose:
+      - 32400
 
   s-nzbget:
     image: linuxserver/nzbget
     container_name: s-nzbget
     ports:
-      - 6789:6789
+      - 5789:6789
     environment:
       - PUID=1000 
       - PGID=1000
       - VIRTUAL_HOST=nzbget.${BASE_URL}
       - NETWORK_ACCESS=internal
-      - DDESCRIPTION=Downloader
+      - DESCRIPTION=Downloader
       - ICON_URL=https://avatars2.githubusercontent.com/u/3368377?s=280&v=4
     volumes:
       - ./s-nzbget/data/config/:/config

@@ -1,6 +1,8 @@
 .idea*
 */.env
 s-*/data
+s-plex/config
+s-plex/transcode
 
 *.pyc
 *.tar.gz

@@ -12,10 +12,25 @@ def render(tpl_path, context):
     ).get_template(filename).render(context)
 
 
+class StaticService(object):
+
+    def __init__(self, name, description, icon_url, url):
+        self.name = name
+        self.description = description
+        self.icon_url = icon_url
+        self.url = url
+        self.active = True
+
+STATIC_SERVICES = [
+  StaticService("CnC Machine", "", "https://cdn.iconscout.com/icon/premium/png-256-thumb/cnc-machine-3-600507.png", "http://192.168.1.10:8000"),
+  StaticService("Plex", "Watching Media", "https://wiki.mrmc.tv/images/c/cf/Plex_icon.png", "http://192.168.1.7:32400"),
+]
+
 class Service(object):
 
     def __init__(self, data, service_name):
         print service_name
+        print data
         self._service_name = service_name
         self._data = data
         self._env = {}
@@ -42,27 +57,30 @@ class Service(object):
     
     @property
     def active(self):
-        return self.url is not None
+        return self.url is not None and self.icon_url is not None
 
     @property
     def url(self):
-        return self._env.get("VIRTUAL_HOST")
+        base_url = os.environ.get("BASE_URL")
+        s = self._env.get("VIRTUAL_HOST")
+        if s is None:
+            return s
 
-    @property
-    def nginx_location(self):
-        path = "../s-{name}/nginx_config".format(name=self.name.lower())
-        with open(path) as f:
-            content = f.read()
-        return content
+        s = s.replace("${BASE_URL}", base_url)
+        return "http://"+s
 
 
 def get_services():
+    for s in STATIC_SERVICES:
+        yield s
     with open("../docker-compose.yml") as f:
         content = f.read()
         compose = yaml.load(content)
         for n in compose.get("services"):
             data = compose.get("services").get(n)
-            yield Service(data, n)
+            s = Service(data, n)
+            if s.active:
+                yield s
 
 
 def download_file(url, path):
