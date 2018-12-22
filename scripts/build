@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source ./scripts/.env
+
+cd s-home
+python ./build_home.py
+docker build . -t serenity-home
+cd ..
+
+cd s-proxy-cnc
+docker build . -t serenity-proxy-cnc
+cd ..
+
+
+cd s-proxy-cnc-webcam
+docker build . -t serenity-proxy-cnc-webcam
+cd ..

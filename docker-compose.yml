@@ -140,3 +140,21 @@ services:
     volumes:
       - ./s-nzbget/data/config/:/config
       - ${DIR_DOWNLOADS}:/downloads
+  
+  s-cnc:
+    image: serenity-proxy-cnc
+    container_name: s-cnc
+    ports:
+      - 2303:80
+    environment:
+      - VIRTUAL_HOST=cnc.${BASE_URL}
+      - ICON_URL=https://www.clipartmax.com/png/middle/183-1838113_new-article-on-open-source-and-free-cnc-toolchain-cnc-icon.png
+  
+  s-cnc-webcam:
+    image: serenity-proxy-cnc-webcam
+    container_name: s-cnc
+    ports:
+      - 2304:80
+    environment:
+      - VIRTUAL_HOST=webcam.cnc.${BASE_URL}
+      - ICON_URL=https://cdn4.iconfinder.com/data/icons/iconsimple-hardware/512/webcam-512.png
