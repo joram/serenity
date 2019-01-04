@@ -22,8 +22,8 @@ class StaticService(object):
         self.active = True
 
 STATIC_SERVICES = [
-  StaticService("CnC Machine", "", "https://cdn.iconscout.com/icon/premium/png-256-thumb/cnc-machine-3-600507.png", "http://192.168.1.10:8000"),
-  StaticService("Plex", "Watching Media", "https://wiki.mrmc.tv/images/c/cf/Plex_icon.png", "http://192.168.1.7:32400"),
+#  StaticService("CnC Machine", "", "https://cdn.iconscout.com/icon/premium/png-256-thumb/cnc-machine-3-600507.png", "http://192.168.1.10:8000"),
+#  StaticService("Plex", "Watching Media", "https://wiki.mrmc.tv/images/c/cf/Plex_icon.png", "http://192.168.1.7:32400"),
 ]
 
 class Service(object):
@@ -67,7 +67,7 @@ class Service(object):
             return s
 
         s = s.replace("${BASE_URL}", base_url)
-        return "http://"+s
+        return "http://{}:2303".format(s)
 
 
 def get_services():

@@ -8,19 +8,36 @@ services:
 
   s-nginx-proxy:
     container_name: s-nginx-proxy
-    image: jwilder/nginx-proxy:latest
+    image: jwilder/nginx-proxy:alpine
+    #    network_mode: host
     ports:
       - 80:80
       - 443:443
-    depends_on:
-      - s-home
-      - s-sonarr
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - nginx-proxy
+
+  s-home:
+    image: serenity-home
+    container_name: s-home
+    depends_on:
+      - s-nginx-proxy
+    ports:
+      - 8001:80
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=home.${BASE_URL}
+      - VIRTUAL_PORT=80
+    networks:
+      - nginx-proxy
   
   s-unifi:
     container_name: s-unifi
     image: linuxserver/unifi:latest
+    depends_on:
+      - s-nginx-proxy
     environment:
       - PUID=1000 
       - PGID=1000
@@ -40,6 +57,8 @@ services:
       - 6789:6789
     volumes:
       - ./s-unifi/data/config:/config
+    networks:
+      - nginx-proxy
 
       #s-letsencrypt:
       #container_name: s-letsencrypt
@@ -50,19 +69,12 @@ services:
       # volumes_from:
 #    - s-nginx-proxy
 
-  s-home:
-    image: serenity-home
-    container_name: s-home
-    ports:
-      - 8001:80
-      - 444:443
-    environment:
-      - VIRTUAL_HOST=home.${BASE_URL}
-      - NETWORK_ACCESS=internal
 
   s-sonarr:
     image: linuxserver/sonarr:latest
     container_name: s-sonarr
+    depends_on:
+      - s-nginx-proxy
     ports:
       - 8989:8989
     environment:
@@ -78,10 +90,14 @@ services:
       - ./s-sonarr/data/config/:/config
       - ${DIR_TV}:/tv
       - ${DIR_DOWNLOADS}:/downloads
+    networks:
+      - nginx-proxy
 
   s-radarr:
     image: linuxserver/radarr:latest
     container_name: s-radarr
+    depends_on:
+      - s-nginx-proxy
     ports:
       - 7878:7878
     environment:
@@ -97,11 +113,15 @@ services:
       - ./s-radarr/data/config/:/config
       - ${DIR_MOVIES}:/movies
       - ${DIR_DOWNLOADS}:/downloads
+    networks:
+      - nginx-proxy
 
   s-plex:
     container_name: s-plex
     image: timhaak/plex:latest
     network_mode: host
+    depends_on:
+      - s-nginx-proxy
     environment: 
       - VERSION=latest
       - PUID=1000 
@@ -124,10 +144,14 @@ services:
       - ${DIR_TV}:/data/tvshows
     expose:
       - 32400
+        #networks:i
+    #    - nginx-proxy
 
   s-nzbget:
     image: linuxserver/nzbget
     container_name: s-nzbget
+    depends_on:
+      - s-nginx-proxy
     ports:
       - 5789:6789
     environment:
@@ -140,21 +164,53 @@ services:
     volumes:
       - ./s-nzbget/data/config/:/config
       - ${DIR_DOWNLOADS}:/downloads
+    networks:
+      - nginx-proxy
   
   s-cnc:
     image: serenity-proxy-cnc
     container_name: s-cnc
-    ports:
-      - 2303:80
+    depends_on:
+      - s-nginx-proxy
     environment:
       - VIRTUAL_HOST=cnc.${BASE_URL}
+      - VIRTUAL_PORT=80
       - ICON_URL=https://www.clipartmax.com/png/middle/183-1838113_new-article-on-open-source-and-free-cnc-toolchain-cnc-icon.png
+    networks:
+      - nginx-proxy
   
   s-cnc-webcam:
     image: serenity-proxy-cnc-webcam
-    container_name: s-cnc
-    ports:
-      - 2304:80
+    container_name: s-cnc-webcam
+    depends_on:
+      - s-nginx-proxy
     environment:
       - VIRTUAL_HOST=webcam.cnc.${BASE_URL}
-      - ICON_URL=https://cdn4.iconfinder.com/data/icons/iconsimple-hardware/512/webcam-512.png
+      - VIRTUAL_PORT=80
+      - ICON_URL=https://www.clipartmax.com/png/middle/29-290333_raspberry-pi-camera-security-motion-eye-os-logo.png
+    networks:
+      - nginx-proxy
+
+  s-pihole:
+    image: pihole/pihole:latest
+    container_name: s-pihole
+    depends_on:
+      - s-nginx-proxy
+    ports:
+      - 53:53
+      - 67:67/udp
+      - 446:443
+    environment:
+      - VIRTUAL_HOST=pihole.${BASE_URL}
+      - VIRTUAL_PORT=80
+      - ICON_URL=https://i2.wp.com/pi-hole.net/wp-content/uploads/2016/12/Vortex-R.png?zoom=2&w=3840&ssl=1
+    volumes:
+      - ./s-pihole/data/config/:/etc/pihole/
+      - ./s-pihole/data/dnsmasq.d/:/etc/dnsmask.d/
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external:
+      name: nginx-proxy
